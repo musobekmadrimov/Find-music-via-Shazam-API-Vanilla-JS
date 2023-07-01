@@ -81,15 +81,15 @@
     <script>
         async function findSongName() {
             const mp3File = document.getElementById('mp3-file-input').files[0];
-            const url = 'https://shazam-api6.p.rapidapi.com/shazam/recognize/';
+            const url = 'https://shazam-api7.p.rapidapi.com/songs/recognize-song';
             const data = new FormData();
-            data.append('upload_file', mp3File);
+            data.append('audio', mp3File);
 
             const options = {
                 method: 'POST',
                 headers: {
                     'X-RapidAPI-Key': '62698d9252msh4796cb3bf9c090fp10c22fjsn5f8467acd459',
-                    'X-RapidAPI-Host': 'shazam-api6.p.rapidapi.com'
+                    'X-RapidAPI-Host': 'shazam-api7.p.rapidapi.com'
                 },
                 body: data
             };
@@ -98,27 +98,25 @@
                 $("#loader").removeClass("d-none");
                 const response = await fetch(url, options);
                 const data = await response.json();
+                console.log(data);
                 $("#loader").addClass("d-none");
-                if (data.status) {
+                if (data.track) {
                     $("#results").removeClass("d-none");
-
-
-
-                    $("#photo").attr("src", data.result.track.images.background);
-                    $("#title").html(data.result.track.title);
-                    $("#subtitle").html(data.result.track.subtitle);
-                    $("#genre").html(data.result.track.genres.primary);
-                    $("#url").attr("href", data.result.track.url);
+                    $("#photo").attr("src", data.track.images.background);
+                    $("#title").html(data.track.title);
+                    $("#subtitle").html(data.track.subtitle);
+                    $("#genre").html(data.track.genres.primary);
+                    $("#url").attr("href", data.track.url);
 
                     let pElement = '<p class="lead">';
-                    if (data.result.track.sections[1].text) {
-                        data.result.track.sections[1].text.forEach((eachRow, index) => {
+                    if (data.track.sections[1].text) {
+                        data.track.sections[1].text.forEach((eachRow, index) => {
                             if (eachRow.length > 0) {
                                 pElement += eachRow + "," + "<br>";
                             } else {
                                 pElement += eachRow + "<br>";
                             }
-                            
+
                         })
                         pElement += "</p>"
                         $("#lyrics").removeClass("text-danger");
@@ -129,9 +127,11 @@
                         $("#lyrics").addClass("text-danger fs-1");
                         $("#lyrics").html("Lyrics not found!");
                     }
+                } else {
+                    alert("Something went wrong! Please, contact with the author!")
                 }
             } catch (error) {
-                console.error(error);
+                alert(error);
             }
         }
     </script>
